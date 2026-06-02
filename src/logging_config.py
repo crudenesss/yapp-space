@@ -1,7 +1,7 @@
 """Special configuration for logging with gunicorn"""
 
 from os import getenv
-from utils.filters import FilterDebug, FilterInfo
+from core.filters import FilterDebug, FilterInfo
 
 LOG_LEVEL = getenv("LOGGING_LEVEL")
 

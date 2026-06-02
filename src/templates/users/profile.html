@@ -39,12 +39,12 @@
   <body>
     <div>
       <img
-        src="{{ url_for('routes.profile_picture', user=data.username) }}"
+        src="{{ url_for('users.profile_picture', user=data.username) }}"
         height="200"
         alt="Profile Photo"
       />
       <div>
-        {% from "_form_macros.html" import render_field %}
+        {% from "layouts/_form_macros.html" import render_field %}
         <form method="post" action="/myprofile" enctype=multipart/form-data>
           {{ form.csrf_token }}
           <input

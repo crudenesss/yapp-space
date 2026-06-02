@@ -1,51 +1,33 @@
-"""main application file"""
+"""Main Flask application factory and error handlers"""
 
 import logging
-from os import getenv
-from datetime import timedelta
-from flask import Flask, redirect, request
-from flask_jwt_extended import JWTManager
+from flask import Flask, redirect
+from config import Config
+from extensions import socket, jwt
+from auth.routes import auth_bp
+from messages.routes import messages_bp
+from users.routes import users_bp
+from messages import events  # Import to register socket events
 
-# from forms import MessageForm
-from utils.constants import SESSION_EXPIRY
-from views import views_bp
-from events import socket
-
-
-class Config(object):
-    """Base Flask app config."""
-    SECRET_KEY = getenv("FLASK_SECRET_KEY")
-
-    # JWT
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=SESSION_EXPIRY)
-    JWT_TOKEN_LOCATION = ["cookies"]
-    JWT_CSRF_CHECK_FORM = True
-
-    # Content validation
-    MAX_CONTENT_LENGTH = 10 * 1024 * 1024
-
-
-def cors_allowed_origins(origin):
-    """Allow all origins for Socket.IO CORS"""
-    return True
+logger = logging.getLogger("gunicorn.access")
 
 
 def create_app():
     """
-    App factory function. Define configurations, blueprints and 
-    other extensions.
+    App factory function. Define configurations, blueprints and extensions.
     """
 
-    # Define app
     app = Flask(__name__)
     app.config.from_object(Config())
 
-    # Blueprints
-    app.register_blueprint(views_bp)
+    # Register blueprints
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(messages_bp)
+    app.register_blueprint(users_bp)
 
-    # Init extensions
+    # Initialize extensions
     socket.init_app(
-        app, 
+        app,
         cors_allowed_origins=cors_allowed_origins,
         cors_credentials=True,
         engineio_logger=False,
@@ -54,33 +36,29 @@ def create_app():
     )
     jwt.init_app(app)
 
+    # Register error handlers
+    @jwt.unauthorized_loader
+    def unauthorized_loader_error(error):
+        """Custom handler for absence of jwt token when accessing an endpoint"""
+        logger.debug(error)
+        return redirect("/login")
+
+    @jwt.expired_token_loader
+    def expired_token_loader_error(token):
+        """Custom handler for expired token provided when accessing an endpoint"""
+        token_type = token["type"]
+        logger.debug("The %s token has expired", token_type)
+        return redirect("/login")
+
+    @jwt.invalid_token_loader
+    def invalid_token_loader_error(error):
+        """Custom handler for invalid jwt token provided when accessing an endpoint"""
+        logger.error(error)
+        return redirect("/login")
+
     return app
 
 
-# Create jwt manager handler
-jwt = JWTManager()
-
-logger = logging.getLogger("gunicorn.access")
-
-
-# Custom exceptions for error responses
-@jwt.unauthorized_loader
-def unauthorized_loader_error(error):
-    """Custom handler for abscence of jwt token when accessing an endpoint"""
-    logger.debug(error)
-    return redirect("/login")
-
-
-@jwt.expired_token_loader
-def expired_token_loader_error(token):
-    """Custom handler for expired token provided when accesssing an endpoint"""
-    token_type = token["type"]
-    logger.debug("The %s token has expired", token_type)
-    return redirect("/login")
-
-
-@jwt.invalid_token_loader
-def invalid_token_loader_error(error):
-    """Custom handler for invalid jwt token provided when accessing an endpoint"""
-    logger.error(error)
-    return redirect("/login")
+def cors_allowed_origins(origin):
+    """Allow all origins for Socket.IO CORS"""
+    return True

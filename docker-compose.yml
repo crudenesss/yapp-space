@@ -31,9 +31,9 @@ services:
       - .env
     develop:
       watch:
-        - action: sync
+        - action: sync+restart
           path: ./src
-          target: /app/src
+          target: /app
     ports:
       - "5000:5000"
     volumes:

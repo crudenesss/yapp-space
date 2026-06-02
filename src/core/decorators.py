@@ -3,7 +3,7 @@
 from functools import wraps
 from flask import abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from services import UserService
+from auth.services import UserService
 
 
 def privilege_required(f):

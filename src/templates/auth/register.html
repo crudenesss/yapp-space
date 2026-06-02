@@ -3,7 +3,7 @@
     <title>Sign up</title>
         <h1>Sign Up</h1>
         <br>
-        {% from "_form_macros.html" import render_field %}
+        {% from "layouts/_form_macros.html" import render_field %}
         <form method='post' action="/register">
             <dl>
                 {{ render_field(form.username) }}

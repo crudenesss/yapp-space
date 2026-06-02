@@ -1,18 +1,15 @@
-"""models connecting to database"""
+"""Auth models for User and Role"""
 
 import logging
 from typing import Optional
 from argon2 import PasswordHasher, exceptions
-from sqlalchemy import String, ForeignKey, Boolean, Integer
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import String, ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from utils.constants import ADMIN_ROLE_ID, MOD_ROLE_ID
+from core.models import Base
+from core.constants import ADMIN_ROLE_ID, MOD_ROLE_ID
 
 logger = logging.getLogger("gunicorn.access")
-
-
-class Base(DeclarativeBase):
-    """DeclarativeBase class wrapped around"""
 
 
 class Role(Base):
@@ -20,7 +17,7 @@ class Role(Base):
 
     __tablename__ = "roles"
 
-    role_id: Mapped[str] = mapped_column(Integer(), primary_key=True)
+    role_id: Mapped[int] = mapped_column(Integer(), primary_key=True)
     role_name: Mapped[str] = mapped_column(String(64))
 
 
@@ -35,7 +32,7 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(320))
     bio: Mapped[Optional[str]] = mapped_column(String(256))
     profile_picture: Mapped[Optional[str]] = mapped_column(String(36))
-    role_id: Mapped[str] = mapped_column(
+    role_id: Mapped[int] = mapped_column(
         Integer(), ForeignKey("roles.role_id", ondelete="RESTRICT", onupdate="CASCADE")
     )
 
@@ -89,29 +86,5 @@ class User(Base):
 
         Returns:
             _str_: JSON string that contains all User class parameters defined.
-        """
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
-
-
-class Message(Base):
-    """Message model"""
-
-    __tablename__ = "messages"
-
-    message_id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    message_content: Mapped[str] = mapped_column(String(4096))
-    message_timestamp: Mapped[str] = mapped_column(String(32))
-    message_edited: Mapped[bool] = mapped_column(Boolean(), default=False)
-    user_id: Mapped[str] = mapped_column(
-        String(36), ForeignKey("users.user_id", onupdate="CASCADE")
-    )
-
-    msg_user_id: Mapped[User] = relationship("User", foreign_keys=[user_id])
-
-    def to_json(self):
-        """Represent Message class as JSON.
-
-        Returns:
-            _str_: JSON string that contains all Message class parameters defined.
         """
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

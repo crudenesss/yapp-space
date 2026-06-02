@@ -3,7 +3,7 @@
 # activates prepared virtual environment 
 . ./.venv/bin/activate
 
-export PYTHONPATH="${PYTHONPATH}:/app/src"
+export PYTHONPATH="${PYTHONPATH}:/app"
 
 # generates secret key for application
 export FLASK_SECRET_KEY="$(tr -dc 'A-Za-z0-9' < /dev/urandom | head -c 256)"
