@@ -106,7 +106,7 @@ class Message(Base):
         String(36), ForeignKey("users.user_id", onupdate="CASCADE")
     )
 
-    msg_user_id: Mapped[str] = relationship("User", foreign_keys=[user_id])
+    msg_user_id: Mapped[User] = relationship("User", foreign_keys=[user_id])
 
     def to_json(self):
         """Represent Message class as JSON.

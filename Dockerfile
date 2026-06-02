@@ -2,7 +2,7 @@ FROM python:3.12-slim AS build
 
 WORKDIR /app
 
-RUN pip install poetry==1.8.3
+RUN pip install poetry==2.4.0
 
 COPY pyproject.toml poetry.lock ./
 
@@ -36,7 +36,9 @@ RUN mkdir $PP_PATH && chmod -R 700 $PP_PATH && chown -R $USERNAME:$USERNAME $PP_
 USER $USERNAME
 
 COPY --from=build --chown=$USERNAME:$USERNAME /app/.venv/ ./.venv/
+
+COPY --chown=${USERNAME}:${USERNAME} ./entrypoint.sh .
     
-COPY --chown=$USERNAME:$USERNAME ./flask_chat/ .
+COPY --chown=$USERNAME:$USERNAME ./src .
 
 ENTRYPOINT [ "sh", "./entrypoint.sh" ]

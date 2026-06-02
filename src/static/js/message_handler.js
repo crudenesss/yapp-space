@@ -1,5 +1,11 @@
 // initialising socket connection
-const socket = io.connect("https://" + document.location.hostname + ":" + document.location.port + "/");
+const socket = io({
+  reconnection: true,
+  reconnectionDelay: 1000,
+  reconnectionDelayMax: 5000,
+  reconnectionAttempts: Infinity,
+  transports: ["websocket", "polling"]
+});
 var messagesLoaded;
 
 // number of overall loaded messages on the page - works as counter

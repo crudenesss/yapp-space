@@ -1,40 +1,15 @@
-"""main application file"""
+"""Socket received events handler"""
 
 import logging
-from os import getenv
-from datetime import timedelta
-from flask import Flask, redirect, render_template
-from flask_socketio import SocketIO
-from flask_jwt_extended import JWTManager, get_jwt_identity, jwt_required
+from flask import render_template
+from flask_socketio import SocketIO, disconnect
+from flask_jwt_extended import verify_jwt_in_request, get_jwt_identity
 
-# from forms import MessageForm
-from utils.constants import MSG_MAX_LENGTH, SESSION_EXPIRY
+from utils.constants import MSG_MAX_LENGTH
 from services import UserService, MessageService
-from views import views_bp
 
-# Define app
-app = Flask(__name__)
-app.debug = True
-
-# Define app configurations
-# JWT
-app.config["SECRET_KEY"] = getenv("FLASK_SECRET_KEY")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=SESSION_EXPIRY)
-app.config["JWT_TOKEN_LOCATION"] = ["cookies"]
-app.config["JWT_CSRF_CHECK_FORM"] = True
-
-# Content validation
-app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
-
-app.register_blueprint(views_bp)
-
-# Create socket handle
-socket = SocketIO(app)
-socket.init_app(app, cors_allowed_origins="*")
-
-# Create jwt manager handler
-jwt = JWTManager(app)
-jwt.init_app(app)
+# Create socket handler
+socket = SocketIO()
 
 logger = logging.getLogger("gunicorn.access")
 
@@ -43,42 +18,41 @@ user_service = UserService()
 message_service = MessageService()
 
 
-# Custom exceptions for error responses
-@jwt.unauthorized_loader
-def unauthorized_loader_error(error):
-    """Custom handler for abscence of jwt token when accessing an endpoint"""
-    logger.debug(error)
-    return redirect("/login")
+@socket.on("connect")
+def handle_connect():
+    """Authenticate client connection with JWT"""
+    try:
+        verify_jwt_in_request(locations=["cookies"])
+        user_id = get_jwt_identity()
+        logger.debug("Client connected with user_id: %s", user_id)
+    except Exception as e:
+        logger.warning("Connection rejected: Invalid or missing JWT token - %s", e)
+        disconnect()
+        return False
 
 
-@jwt.expired_token_loader
-def expired_token_loader_error(token):
-    """Custom handler for expired token provided when accesssing an endpoint"""
-    token_type = token["type"]
-    logger.debug("The %s token has expired", token_type)
-    return redirect("/login")
-
-
-@jwt.invalid_token_loader
-def invalid_token_loader_error(error):
-    """Custom handler for invalid jwt token provided when accessing an endpoint"""
-    logger.error(error)
-    return redirect("/login")
+@socket.on("connect_error")
+def handle_connect_error(data):
+    """Handle failed connection attempts"""
+    logger.error("Connection failed: %s", data)
 
 
 @socket.on("message")
-@jwt_required()
 def handle_message(msg):
     """handle initial messages sent via websocket and saves them to database"""
+    try:
+        verify_jwt_in_request(locations=["cookies"])
+        user_id = get_jwt_identity()
+    except Exception as e:
+        logger.error("Message rejected: JWT verification failed - %s", e)
+        disconnect()
+        return
 
     # If recevived message length is more than required
     if len(msg.get("message")) > MSG_MAX_LENGTH:
         logger.debug("Message length limit exceeded")
         socket.emit("message_too_long", {"msg_length": MSG_MAX_LENGTH})
         return
-
-    # Getting the username of message sender
-    user_id = get_jwt_identity()
 
     # Retrieve message
     message = msg.get("message")
@@ -101,11 +75,14 @@ def handle_message(msg):
 
 
 @socket.on("request_message")
-@jwt_required()
 def load_messages(cnt):
     """handle socket request to load bunch of messages from database"""
-
-    logger.debug("Messages loaded: %s", cnt)
+    try:
+        verify_jwt_in_request(locations=["cookies"])
+    except Exception as e:
+        logger.error("Message load rejected: JWT verification failed - %s", e)
+        disconnect()
+        return
 
     # Validation piece: handles random other tampered values in global
     # counter variable than numbers
