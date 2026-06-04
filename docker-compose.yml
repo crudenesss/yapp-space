@@ -29,6 +29,11 @@ services:
         condition: service_healthy
     env_file:
       - .env
+    develop:
+      watch:
+        - action: sync+restart
+          path: ./src
+          target: /app
     ports:
       - "5000:5000"
     volumes:

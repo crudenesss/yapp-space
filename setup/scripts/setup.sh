@@ -16,7 +16,7 @@ psql -c "CREATE TABLE users (
     passwd VARCHAR(256) NOT NULL,
     email VARCHAR(320) NOT NULL,
     bio VARCHAR(256),
-    profile_picture VARCHAR(36),
+    profile_picture VARCHAR(40),
     role_id INTEGER,
 
     FOREIGN KEY (role_id) REFERENCES roles(role_id)
@@ -25,7 +25,7 @@ psql -c "CREATE TABLE users (
 psql -c "CREATE TABLE messages (
     message_id VARCHAR(36) PRIMARY KEY,
     message_content VARCHAR(4096) NOT NULL,
-    message_timestamp VARCHAR(32) NOT NULL, 
+    message_timestamp TIMESTAMPTZ NOT NULL,
     message_edited BOOLEAN NOT NULL,
     user_id VARCHAR(36),
 

@@ -1,27 +1,29 @@
-[tool.poetry]
-package-mode = false
-name = "flask-chat"
+[project]
+name = "yapp-space"
 version = "0.1.0"
 description = ""
-authors = ["crudenesss <osbochok.w@gmail.com>"]
+authors = [
+    {name = "crudenesss",email = "osbochok.w@gmail.com"}
+]
 readme = "README.md"
-
-[tool.poetry.dependencies]
-python = "^3.11"
-argon2-cffi = "^23.1.0"
-flask = "^3.0.3"
-flask-socketio = "^5.3.6"
-gunicorn = "^22.0.0"
-eventlet = "^0.36.1"
-wtforms = "^3.1.2"
-email-validator = "^2.2.0"
-pillow = "^10.4.0"
-python-magic = "^0.4.27"
-flask-jwt-extended = "^4.6.0"
-sqlalchemy = "^2.0.35"
-psycopg2-binary = "^2.9.9"
+requires-python = ">=3.11,<4"
+dependencies = [
+    "flask (>=3.1.3,<4.0.0)",
+    "flask-jwt-extended (>=4.7.4,<5.0.0)",
+    "sqlalchemy (>=2.0.50,<3.0.0)",
+    "argon2-cffi (>=25.1.0,<26.0.0)",
+    "flask-wtf (>=1.3.0,<2.0.0)",
+    "flask-socketio (>=5.6.1,<6.0.0)",
+    "python-magic (>=0.4.27,<0.5.0)",
+    "pillow (>=12.2.0,<13.0.0)",
+    "gunicorn (>=26.0.0,<27.0.0)",
+    "gevent (>=26.5.0,<27.0.0)",
+    "psycopg2-binary (>=2.9.12,<3.0.0)",
+    "email-validator (>=2.3.0,<3.0.0)",
+    
+]
 
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

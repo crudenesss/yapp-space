@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Profile</title>
+  </head>
+  <body>
+    <div>
+      <img
+        src="{{ url_for('users.profile_picture', user=data.username) }}"
+        height="200"
+        alt="Profile Photo"
+      />
+      <div>
+        {% from "layouts/_form_macros.html" import render_field %}
+        <form method="post" action="/myprofile" enctype=multipart/form-data>
+          {{ form.csrf_token }}
+          <input
+            id="pic-upload"
+            type="file"
+            name="file"
+            accept="image/gif, image/jpeg, image/png, image/webp"
+          />
+          <dl>
+            {{ render_field(form.username) }}
+            {{ render_field(form.email) }}
+            {{ render_field(form.bio) }}
+          </dl>
+          <button id="save">Save Changes</button>
+        </form>
+        <div>
+          <a href="/">Back to Chat</a>
+          <a href="/profile/{{data.username}}">Switch to public view</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for message in messages %}{{ message[1] }}{% endfor %}
+          {% endif %}
+        {% endwith %}
+      </div>
+    </div>
+  </body>
+</html>

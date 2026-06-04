@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <title>Sign in</title>
+  <body>
+    <h1>Sign in</h1>
+    <br />
+    {% from "layouts/_form_macros.html" import render_field %}
+    <form method="post" action="/login">
+      <dl>
+        {{ render_field(form.username) }} {{ render_field(form.password) }}
+      </dl>
+      <button>Sign in</button>
+    </form>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} 
+        {% if messages %} 
+            {% for message in messages %} 
+                {{ message[1] }}
+            {% endfor %}
+        {% endif %} 
+    {% endwith %}
+    <p>Here for the first time? <a href="/register">Sign up here!</a></p>
+  </body>
+</html>

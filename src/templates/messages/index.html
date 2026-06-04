@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ web_name }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script
+      type="text/javascript"
+      src="{{url_for('static', filename='js/message_handler.js')}}"
+    ></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  </head>
+  <body>
+    <div class="bg-panel">
+      <nav>
+      <ul>
+        <li><a href="/myprofile">Profile</a></li>
+        {% if usr_data.role_id in [1, 2] %}
+          <li><a href="/manage">Manage Chat</a></li>
+        {% endif %}
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </nav>
+
+    <script>
+      initCounter("{{ msg_data | length }}");
+      const currentUser = "{{ usr_data.username }}";
+    </script>
+
+    <div class="layout">
+      <div class="chat-area">
+        <button id="l" onclick="reqMessages()">Load More</button>
+        <div id="messages">
+          {% for msg in msg_data %}
+          <div class="msg-row {{ 'own' if msg.username == usr_data.username }}">
+            <div class="bubble">
+              <div class="bubble-author">
+                <a href="/profile/{{ msg.username }}">{{ msg.username }}</a>
+              </div>
+              <div>{{ msg.message_content }}</div>
+              <div class="bubble-time timestamp" data-timestamp="{{ msg.message_timestamp.isoformat() }}"></div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="chat-input">
+          <input id="m" autocomplete="off" />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+        <p id="msg-panel"></p>
+      </div>
+
+      <aside class="sidebar">
+        <div class="sidebar-tabs">
+          <a href="?panel=members" class="{{ 'active' if panel == 'members' }}">Members</a>
+          <a href="?panel=profile" class="{{ 'active' if panel == 'profile' }}">Profile</a>
+        </div>
+        <div class="sidebar-content">
+          {% if panel == "members" %}
+            {% for member in members %}
+            <div class="member-entry">
+              <img
+                src="{{ url_for('users.profile_picture', user=member.username) }}"
+                alt="{{ member.username }}"
+              />
+              <a href="/profile/{{ member.username }}">{{ member.username }}</a>
+            </div>
+            {% endfor %}
+          {% else %}
+            <img
+              class="profile-avatar"
+              src="{{ url_for('users.profile_picture', user=usr_data.username) }}"
+              alt="{{ usr_data.username }}"
+            />
+            <dl class="profile-info">
+              <dt>Username</dt>
+              <dd>{{ usr_data.username }}</dd>
+              <dt>Email</dt>
+              <dd>{{ usr_data.email }}</dd>
+              {% if usr_data.bio %}
+              <dt>Bio</dt>
+              <dd>{{ usr_data.bio }}</dd>
+              {% endif %}
+            </dl>
+            <a href="/myprofile">Edit Profile</a>
+          {% endif %}
+        </div>
+      </aside>
+    </div>
+  </body>
+</html>
