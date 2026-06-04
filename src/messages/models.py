@@ -1,6 +1,8 @@
 """Message model"""
 
-from sqlalchemy import String, ForeignKey, Boolean
+from datetime import datetime
+
+from sqlalchemy import DateTime, String, ForeignKey, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.models import Base
@@ -14,7 +16,7 @@ class Message(Base):
 
     message_id: Mapped[str] = mapped_column(String(36), primary_key=True)
     message_content: Mapped[str] = mapped_column(String(4096))
-    message_timestamp: Mapped[str] = mapped_column(String(32))
+    message_timestamp: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     message_edited: Mapped[bool] = mapped_column(Boolean(), default=False)
     user_id: Mapped[str] = mapped_column(
         String(36), ForeignKey("users.user_id", onupdate="CASCADE")

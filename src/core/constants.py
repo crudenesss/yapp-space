@@ -16,4 +16,4 @@ WEBSITE_NAME = "YappSpace"
 
 # File storage
 PROFILE_PICTURE_STORAGE_PATH = "/profile_pictures"
-DEFAULT_PROFILE_PICTURE_PATH = "src/static/images/default_profile_picture.png"
+DEFAULT_PROFILE_PICTURE_PATH = "/app/static/images/default_profile_picture.jpg"

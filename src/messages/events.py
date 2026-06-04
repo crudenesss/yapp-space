@@ -102,6 +102,6 @@ def load_messages(cnt):
         message = {
             "username": msg.get("username"),
             "message": msg.get("message_content"),
-            "timestamp": str(msg.get("message_timestamp")),
+            "timestamp": msg.get("message_timestamp").isoformat(),
         }
         socket.emit("load", message)

@@ -10,31 +10,177 @@
       type="text/javascript"
       src="{{url_for('static', filename='js/message_handler.js')}}"
     ></script>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+      }
+      .bg-panel {
+        background-color: #f0f0f0;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
+      nav ul {
+        display: flex;
+        gap: 1rem;
+        list-style: none;
+        margin: 0;
+        padding: 0.5rem 1rem;
+      }
+      .layout {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+      }
+      .chat-area {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        padding: 1rem;
+        overflow: hidden;
+      }
+      #messages {
+        flex: 1;
+        overflow-y: auto;
+      }
+      .chat-input {
+        display: flex;
+        gap: 0.5rem;
+        padding-top: 0.5rem;
+      }
+      .chat-input input {
+        flex: 1;
+      }
+      .sidebar {
+        width: 260px;
+        border-left: 1px solid #ccc;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+      .sidebar-tabs {
+        display: flex;
+        border-bottom: 1px solid #ccc;
+      }
+      .sidebar-tabs a {
+        flex: 1;
+        text-align: center;
+        padding: 0.6rem;
+        text-decoration: none;
+        color: inherit;
+      }
+      .sidebar-tabs a.active {
+        font-weight: bold;
+        border-bottom: 2px solid currentColor;
+      }
+      .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 0.75rem;
+      }
+      .member-entry {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0;
+      }
+      .member-entry img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .profile-avatar {
+        display: block;
+        margin: 0 auto 0.75rem;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+      .profile-info dt {
+        font-weight: bold;
+        margin-top: 0.5rem;
+      }
+      .profile-info dd {
+        margin: 0 0 0.25rem 0;
+        word-break: break-word;
+      }
+    </style>
   </head>
   <body>
-    <ul>
-      <li><a href="/myprofile">Profile</a></li>
-      {% if usr_data.role_id in [1, 2] %}
-        <li><a href="/manage">Manage Chat</a></li>
-      {% endif %}
-      <li><a href="/logout">Log out</a></li>
-    </ul>
+    <div class="bg-panel">
+      <nav>
+      <ul>
+        <li><a href="/myprofile">Profile</a></li>
+        {% if usr_data.role_id in [1, 2] %}
+          <li><a href="/manage">Manage Chat</a></li>
+        {% endif %}
+        <li><a href="/logout">Log out</a></li>
+      </ul>
+    </nav>
 
     <script>
       initCounter("{{ msg_data | length }}");
     </script>
 
-    <button id="l" onclick="reqMessages()">Load More</button>
-    <div id="messages">
-      {% for msg in msg_data %}
-      <div>
-        <p><a href="/profile/{{ msg.username }}">{{ msg.username }}</a></p>
-        <p>{{ msg.message_content }}</p>
-        <p class="timestamp" data-timestamp="{{ msg.message_timestamp }}"></p>
+    <div class="layout">
+      <div class="chat-area">
+        <button id="l" onclick="reqMessages()">Load More</button>
+        <div id="messages">
+          {% for msg in msg_data %}
+          <div>
+            <p><a href="/profile/{{ msg.username }}">{{ msg.username }}</a></p>
+            <p>{{ msg.message_content }}</p>
+            <p class="timestamp" data-timestamp="{{ msg.message_timestamp.isoformat() }}"></p>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="chat-input">
+          <input id="m" autocomplete="off" />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+        <p id="msg-panel"></p>
       </div>
-      {% endfor %}
+
+      <aside class="sidebar">
+        <div class="sidebar-tabs">
+          <a href="?panel=members" class="{{ 'active' if panel == 'members' }}">Members</a>
+          <a href="?panel=profile" class="{{ 'active' if panel == 'profile' }}">Profile</a>
+        </div>
+        <div class="sidebar-content">
+          {% if panel == "members" %}
+            {% for member in members %}
+            <div class="member-entry">
+              <img
+                src="{{ url_for('users.profile_picture', user=member.username) }}"
+                alt="{{ member.username }}"
+              />
+              <a href="/profile/{{ member.username }}">{{ member.username }}</a>
+            </div>
+            {% endfor %}
+          {% else %}
+            <img
+              class="profile-avatar"
+              src="{{ url_for('users.profile_picture', user=usr_data.username) }}"
+              alt="{{ usr_data.username }}"
+            />
+            <dl class="profile-info">
+              <dt>Username</dt>
+              <dd>{{ usr_data.username }}</dd>
+              <dt>Email</dt>
+              <dd>{{ usr_data.email }}</dd>
+              {% if usr_data.bio %}
+              <dt>Bio</dt>
+              <dd>{{ usr_data.bio }}</dd>
+              {% endif %}
+            </dl>
+            <a href="/myprofile">Edit Profile</a>
+          {% endif %}
+        </div>
+      </aside>
     </div>
-    <input id="m" autocomplete="off" /><button onclick="sendMessage()">Send</button>
-    <p id="msg-panel"></p>
   </body>
 </html>

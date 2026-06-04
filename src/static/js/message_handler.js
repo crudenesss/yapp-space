@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const timestamps = document.querySelectorAll(".timestamp");
   timestamps.forEach(function (timestampElement) {
     const rawTimestamp = timestampElement.getAttribute("data-timestamp");
-    const formattedTimestamp = getTime(parseFloat(rawTimestamp) * 1000);
+    const formattedTimestamp = getTime(rawTimestamp);
     timestampElement.textContent = formattedTimestamp;
   });
 });
@@ -34,7 +34,7 @@ socket.on("load", function (msg) {
   var nestedDiv = $("<div>").append(
     $(`<a href=/profile/${msg.username}>`).text(msg.username),
     $("<p>").text(msg.message),
-    $("<p>").text(getTime(parseFloat(msg.timestamp) * 1000))
+    $("<p>").text(getTime(msg.timestamp))
   );
 
   // inserts loaded messages before the existing list

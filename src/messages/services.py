@@ -1,7 +1,7 @@
 """Message services for database operations"""
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 from extensions import SessionLocal
 from messages.models import Message
@@ -54,7 +54,7 @@ class MessageService:
             new_message = Message(
                 message_id=random_strings_generator(),
                 message_content=message,
-                message_timestamp=str(datetime.now().timestamp()),
+                message_timestamp=datetime.now(timezone.utc),
                 user_id=user_id
             )
 
