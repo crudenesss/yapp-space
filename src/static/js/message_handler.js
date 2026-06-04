@@ -29,30 +29,27 @@ socket.on("loading_finished", function () {
   loadButton.style.display = "none";
 });
 
+function buildBubble(username, message, timestamp) {
+  var isOwn = username === currentUser;
+  var bubble = $("<div>").addClass("bubble").append(
+    $("<div>").addClass("bubble-author").append(
+      $(`<a href=/profile/${username}>`).text(username)
+    ),
+    $("<div>").text(message),
+    $("<div>").addClass("bubble-time").text(getTime(timestamp))
+  );
+  return $("<div>").addClass("msg-row" + (isOwn ? " own" : "")).append(bubble);
+}
+
 // receives group of messages with "load more" button
 socket.on("load", function (msg) {
-  var nestedDiv = $("<div>").append(
-    $(`<a href=/profile/${msg.username}>`).text(msg.username),
-    $("<p>").text(msg.message),
-    $("<p>").text(getTime(msg.timestamp))
-  );
-
-  // inserts loaded messages before the existing list
-  $("#messages").prepend(nestedDiv);
+  $("#messages").prepend(buildBubble(msg.username, msg.message, msg.timestamp));
   messagesLoaded = (parseInt(messagesLoaded, 10) + 1).toString();
 });
 
 // displays messages received from socket
 socket.on("message", function (msg) {
-  var timestamp = Date.now();
-  var nestedDiv = $("<div>").append(
-    $(`<a href=/profile/${msg.username}>`).text(msg.username),
-    $("<p>").text(msg.message),
-    $("<p>").text(getTime(timestamp))
-  );
-
-  // adds received messages to list
-  $("#messages").append(nestedDiv);
+  $("#messages").append(buildBubble(msg.username, msg.message, new Date().toISOString()));
   messagesLoaded = (parseInt(messagesLoaded, 10) + 1).toString();
 });
 

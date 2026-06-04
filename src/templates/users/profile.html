@@ -4,37 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>My Profile</title>
-    <script>
-      let dbValues = {};
-      function toggleEdit() {
-        const dataElements = document.querySelectorAll(".editable");
-
-        const saveButton = document.getElementById("save");
-        saveButton.style.display =
-          saveButton.style.display === "none" ? "inline" : "none";
-
-        const photoUploadButton = document.getElementById("pic-upload");
-        photoUploadButton.style.display =
-          photoUploadButton.style.display === "none" ? "inline" : "none";
-
-        const switchButton = document.getElementById("switch");
-        if (switchButton.textContent === "Edit Profile") {
-          // When info is editable - store default values from db
-          dataElements.forEach((el) => {
-            dbValues[el.name] = el.value;
-            el.readOnly = false;
-          });
-          switchButton.textContent = "Cancel";
-        } else {
-          // When info is non-editable - restore values to display
-          dataElements.forEach((el) => {
-            el.value = dbValues[el.name];
-            el.readOnly = true;
-          });
-          switchButton.textContent = "Edit Profile";
-        }
-      }
-    </script>
   </head>
   <body>
     <div>
@@ -49,29 +18,27 @@
           {{ form.csrf_token }}
           <input
             id="pic-upload"
-            style="display: none"
             type="file"
             name="file"
             accept="image/gif, image/jpeg, image/png, image/webp"
           />
           <dl>
-            {{ render_field(form.username) }} 
-            {{ render_field(form.email) }} 
+            {{ render_field(form.username) }}
+            {{ render_field(form.email) }}
             {{ render_field(form.bio) }}
           </dl>
-          <button id="save" style="display: none">Save Changes</button>
+          <button id="save">Save Changes</button>
         </form>
         <div>
-          {% if current_user == data.username %}
-            <button onclick="toggleEdit()" id="switch">Edit Profile</button>
-          {% endif %}
           <a href="/">Back to Chat</a>
           <a href="/profile/{{data.username}}">Switch to public view</a>
         </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %} {% if
-        messages %} {% for message in messages %} {{ message[1] }} {% endfor %}
-        {% endif %} {% endwith %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for message in messages %}{{ message[1] }}{% endfor %}
+          {% endif %}
+        {% endwith %}
       </div>
     </div>
   </body>

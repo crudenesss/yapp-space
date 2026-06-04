@@ -1,0 +1,168 @@
+body {
+display: flex;
+flex-direction: column;
+height: 100vh;
+margin: 0;
+background-color: #b8bfc9;
+}
+
+.bg-panel {
+background-color: #f0f0f0;
+flex: 1;
+display: flex;
+flex-direction: column;
+margin: 16px;
+border-radius: 12px;
+overflow: hidden;
+}
+
+nav ul {
+display: flex;
+gap: 1rem;
+list-style: none;
+margin: 0;
+padding: 0.6rem 1rem;
+background-color: #e4e7ec;
+border-bottom: 1px solid #ccc;
+}
+
+.layout {
+display: flex;
+flex: 1;
+overflow: hidden;
+}
+
+.chat-area {
+display: flex;
+flex-direction: column;
+flex: 1;
+padding: 1rem;
+overflow: hidden;
+}
+
+#messages {
+flex: 1;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 6px;
+padding: 0.5rem 0;
+}
+
+.msg-row {
+display: flex;
+}
+
+.msg-row.own {
+justify-content: flex-end;
+}
+
+.bubble {
+max-width: 65%;
+padding: 8px 12px;
+border-radius: 16px;
+background-color: #dde1e7;
+word-break: break-word;
+}
+
+.msg-row.own .bubble {
+background-color: #4a90d9;
+color: #fff;
+}
+
+.bubble .bubble-author {
+font-size: 0.75rem;
+font-weight: bold;
+margin-bottom: 2px;
+}
+
+.msg-row.own .bubble .bubble-author {
+display: none;
+}
+
+.bubble .bubble-author a {
+color: inherit;
+}
+
+.bubble .bubble-time {
+font-size: 0.7rem;
+opacity: 0.6;
+margin-top: 4px;
+text-align: right;
+}
+
+.chat-input {
+display: flex;
+gap: 0.5rem;
+padding-top: 0.75rem;
+border-top: 1px solid #ccc;
+}
+
+.chat-input input {
+flex: 1;
+}
+
+.sidebar {
+width: 260px;
+border-left: 1px solid #ccc;
+display: flex;
+flex-direction: column;
+overflow: hidden;
+background-color: #f8f8f8;
+}
+
+.sidebar-tabs {
+display: flex;
+border-bottom: 1px solid #ccc;
+}
+
+.sidebar-tabs a {
+flex: 1;
+text-align: center;
+padding: 0.6rem;
+text-decoration: none;
+color: inherit;
+}
+
+.sidebar-tabs a.active {
+font-weight: bold;
+border-bottom: 2px solid #4a90d9;
+color: #4a90d9;
+}
+
+.sidebar-content {
+flex: 1;
+overflow-y: auto;
+padding: 0.75rem;
+}
+
+.member-entry {
+display: flex;
+align-items: center;
+gap: 0.5rem;
+padding: 0.4rem 0;
+}
+
+.member-entry img {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+object-fit: cover;
+}
+
+.profile-avatar {
+display: block;
+margin: 0 auto 0.75rem;
+border-radius: 50%;
+object-fit: cover;
+}
+
+.profile-info dt {
+font-weight: bold;
+margin-top: 0.5rem;
+}
+
+.profile-info dd {
+margin: 0 0 0.25rem 0;
+word-break: break-word;
+}
